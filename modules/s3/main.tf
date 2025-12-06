@@ -1,7 +1,5 @@
-#TODO: Change kms to use data source
-resource "aws_kms_key" "default" {
-  description             = "This key is used to encrypt bucket objects"
-  deletion_window_in_days = 10
+data "aws_kms_alias" "s3" {
+  name = var.kms_key_alias
 }
 
 resource "aws_s3_bucket" "main" {
