@@ -1,7 +1,5 @@
-#TODO: Change kms to use data source
-resource "aws_kms_key" "default" {
-  description             = "This key is used to encrypt bucket objects"
-  deletion_window_in_days = 10
+data "aws_kms_key" "default" {
+  key_id = var.kms_key_alias
 }
 
 resource "aws_s3_bucket" "main" {
@@ -24,7 +22,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.default.arn
+      kms_master_key_id = data.aws_kms_key.default.arn
       sse_algorithm     = "aws:kms"
     }
   }
