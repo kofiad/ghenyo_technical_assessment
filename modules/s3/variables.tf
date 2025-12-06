@@ -14,3 +14,9 @@ variable "versioning_configuration" {
   type = bool
   default = true
 }
+
+variable "kms_key_alias" {
+  description = "Alias of kms key for SSE"
+  type = string
+  default = "alias/aws/s3"
+}
