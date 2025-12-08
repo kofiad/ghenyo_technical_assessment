@@ -1,28 +1,16 @@
 terraform {
   required_version = ">= 1.3"
+  
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
 }
 
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-}
-
-variable "state_bucket_prefix" {
-  description = "Prefix for state bucket name"
-  type        = string
-  default     = "terraform-state"
-}
-
-variable "lock_table_name" {
-  description = "DynamoDB table for state locking"
-  type        = string
-  default     = "terraform-locks"
-}
-
-variable "environment" {
-  description = "Environment tag"
-  type        = string
-  default     = "bootstrap"
+provider "aws" {
+  region = var.aws_region
 }
 
 data "aws_caller_identity" "current" {}
@@ -89,14 +77,4 @@ resource "aws_dynamodb_table" "terraform_locks" {
     Name        = var.lock_table_name
     Environment = var.environment
   }
-}
-
-output "state_bucket_name" {
-  description = "S3 bucket for Terraform state"
-  value       = aws_s3_bucket.terraform_state.id
-}
-
-output "lock_table_name" {
-  description = "DynamoDB table for state locking"
-  value       = aws_dynamodb_table.terraform_locks.name
 }
