@@ -3,7 +3,6 @@ terraform {
   source = "../../../modules/backend-bootstrap"
 }
 
-# Disable remote state for bootstrap (chicken-and-egg issue)
 remote_state {
   backend = "local"
   
