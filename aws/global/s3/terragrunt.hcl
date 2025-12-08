@@ -4,7 +4,16 @@ terraform {
 }
 
 # Disable remote state for bootstrap (chicken-and-egg issue)
-skip = false
+remote_state {
+  backend = "local"
+  
+  config = {}
+  
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite"
+  }
+}
 
 inputs = {
   aws_region           = "eu-west-2"
