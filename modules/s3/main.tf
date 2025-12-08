@@ -22,7 +22,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
 
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.default.arn
+      kms_master_key_id = data.aws_kms_alias.s3.target_key_arn
       sse_algorithm     = "aws:kms"
     }
   }
