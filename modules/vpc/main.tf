@@ -1,5 +1,9 @@
 data "aws_region" "current"{}
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 resource "aws_vpc" "main" {
   cidr_block       = var.vpc_cidr
   instance_tenancy = "default"
@@ -40,8 +44,9 @@ resource "aws_nat_gateway" "natgw" {
 }
 
 resource "aws_subnet" "public-a" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = local.public_subnet_a_cidr
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = local.public_subnet_a_cidr
+  availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
     Name = "${var.vpc_name}-public-a"
@@ -49,8 +54,9 @@ resource "aws_subnet" "public-a" {
 }
 
 resource "aws_subnet" "public-b" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = local.public_subnet_b_cidr
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = local.public_subnet_b_cidr
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     Name = "${var.vpc_name}-public-b"
@@ -58,8 +64,9 @@ resource "aws_subnet" "public-b" {
 }
 
 resource "aws_subnet" "private-a" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = local.private_subnet_a_cidr
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = local.private_subnet_a_cidr
+  availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
     Name = "${var.vpc_name}-private-a"
@@ -67,8 +74,9 @@ resource "aws_subnet" "private-a" {
 }
 
 resource "aws_subnet" "private-b" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = local.private_subnet_b_cidr
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = local.private_subnet_b_cidr
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
     Name = "${var.vpc_name}-private-b"
