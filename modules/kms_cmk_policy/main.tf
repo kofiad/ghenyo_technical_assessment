@@ -8,43 +8,107 @@ resource "aws_kms_key_policy" "default" {
 }
 
 data "aws_iam_policy_document" "default" {
+  # Allow root account full KMS access for key management
   statement {
-    sid = "AllowRootAccess"
+    sid     = "EnableRootAccountPermissions"
     actions = ["kms:*"]
-    effect = "Allow"
+    effect  = "Allow"
+    
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
+    
     resources = ["*"]
   }
 
+  # Allow CloudWatch Logs to use the key for encryption
+  statement {
+    sid = "AllowCloudWatchLogs"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:CreateGrant",
+      "kms:DescribeKey"
+    ]
+    effect = "Allow"
+    
+    principals {
+      type        = "Service"
+      identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+    }
+    
+    resources = ["*"]
+    
+    condition {
+      test     = "ArnLike"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
+    }
+  }
+
+  # Allow S3 to use the key for bucket encryption
+  statement {
+    sid = "AllowS3Service"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    effect = "Allow"
+    
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    
+    resources = ["*"]
+  }
+
+  # Allow ECS instances with specific tags to use the key
   statement {
     sid = "AllowInstanceRolesByTag"
-    actions = ["kms:Decrypt", "kms:Encrypt", "kms:GenerateDataKey"]
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+      "kms:DescribeKey"
+    ]
     effect = "Allow"
+    
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["*"]
     }
-    resources = [aws_kms_key.default.arn]
-
+    
+    resources = ["*"]
+    
     condition {
-      test = "StringEquals"
-      variable = "aws:RequestTag/Environment"
-      values = [var.environment]
+      test     = "StringEquals"
+      variable = "aws:PrincipalTag/Environment"
+      values   = [var.environment]
+    }
+  }
+
+  # Allow RDS instances use the key for encryption
+  statement {
+    sid = "AllowRDSService"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:CreateGrant",
+      "kms:DescribeKey"
+    ]
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["rds.amazonaws.com"]
     }
 
-    condition {
-      test = "StringEquals"
-      variable = "aws:RequestTag/Domain"
-      values = [var.environment]
-    }
-
-    condition {
-      test = "StringEquals"
-      variable = "aws:RequestTag/Workload"
-      values = [var.environment]
-    }
+    resources = ["*"]
   }
 }
