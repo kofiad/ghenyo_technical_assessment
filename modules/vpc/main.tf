@@ -37,15 +37,12 @@ resource "aws_nat_gateway" "natgw" {
   tags = {
     Name =  "${var.vpc_name}-natgw"
   }
-
-  # To ensure proper ordering, it is recommended to add an explicit dependency
-  # on the Internet Gateway for the VPC.
   depends_on = [aws_internet_gateway.igw]
 }
 
 resource "aws_subnet" "public-a" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = local.public_subnet_a_cidr
+  cidr_block        = var.public_subnet_a_cidr
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
@@ -53,19 +50,9 @@ resource "aws_subnet" "public-a" {
   }
 }
 
-resource "aws_subnet" "public-b" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = local.public_subnet_b_cidr
-  availability_zone = data.aws_availability_zones.available.names[1]
-
-  tags = {
-    Name = "${var.vpc_name}-public-b"
-  }
-}
-
 resource "aws_subnet" "private-a" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = local.private_subnet_a_cidr
+  cidr_block        = var.private_subnet_a_cidr
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
@@ -75,7 +62,7 @@ resource "aws_subnet" "private-a" {
 
 resource "aws_subnet" "private-b" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = local.private_subnet_b_cidr
+  cidr_block        = var.private_subnet_b_cidr
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
@@ -111,11 +98,6 @@ resource "aws_route_table" "private" {
 
 resource "aws_route_table_association" "public-a" {
   subnet_id      = aws_subnet.public-a.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "public-b" {
-  subnet_id      = aws_subnet.public-b.id
   route_table_id = aws_route_table.public.id
 }
 
