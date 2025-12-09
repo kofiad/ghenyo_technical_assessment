@@ -23,9 +23,15 @@ variable "log_bucket_id" {
   type = string
 }
 
-variable "vpc_id" {
-  description = "ID of the vpc"
-  type = string
+variable "certificate_arn" {
+  description = "ARN of the SSL certificate for the HTTPS listener"
+  type        = string
+}
+
+variable "target_group_arn" {
+  description = "Optional target group ARN to forward HTTPS traffic to"
+  type        = string
+  default     = ""
 }
 
 locals {
