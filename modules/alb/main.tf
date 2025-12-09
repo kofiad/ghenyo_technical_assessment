@@ -1,24 +1,9 @@
-terraform {
-  required_version = ">= 1.0.0, < 2.0.0"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.0"
-    }
-  }
-}
-
-data "aws_vpc" "main"{
-  id = var.vpc_id
-}
-
 resource "aws_lb" "main" {
   name               = var.alb_name
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.lb_sg.id]
-  subnets            = [for subnet in aws_subnet.public : subnet.id]
+  subnets            = var.subnet_ids
 
   enable_deletion_protection = true
 
@@ -55,11 +40,29 @@ resource "aws_lb_listener" "https" {
   port              = local.https_port
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  certificate_arn   = var.certificate_arn
 
-  default_action {
-    type             = "forward"
-    # target_group_arn = aws_lb_target_group.back_end.arn
+  dynamic "default_action" {
+    for_each = var.target_group_arn != "" ? [1] : []
+
+    content {
+      type             = "forward"
+      target_group_arn = var.target_group_arn
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = var.target_group_arn == "" ? [1] : []
+
+    content {
+      type = "fixed-response"
+
+      fixed_response {
+        content_type = "text/plain"
+        message_body = "No backend target registered"
+        status_code  = "200"
+      }
+    }
   }
 }
 
@@ -91,8 +94,8 @@ resource "aws_security_group_rule" "allow_outbound_to_vpc" {
   type              = "egress"
   security_group_id = aws_security_group.lb_sg.id
 
-  from_port   = local.https_port
-  to_port     = local.https_port
-  protocol    = local.tcp_protocol
-  cidr_blocks = [data.aws_vpc.selected.cidr_block]
+  from_port   = local.any_port
+  to_port     = local.any_port
+  protocol    = "-1"
+  cidr_blocks = local.all_ips
 }
