@@ -3,7 +3,7 @@ include "root" {
 }
 
 terraform {
-    source = "../../../../../modules/kms_cmk_policy"
+    source = "../../../../modules/kms_cmk_policy"
 }
 
 dependency "kms" {
