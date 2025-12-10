@@ -1,24 +1,3 @@
-resource "aws_security_group" "rds_sg" {
-  name = "${var.name}-sg"
-  description = "${var.name} rds instance security group"
-  vpc_id = var.vpc_id
-
-  ingress{
-    description = "Allow database traffic on its port"
-    from_port = var.database_port
-    to_port = var.database_port
-    protocol = "tcp"
-    cidr_blocks = var.allowed_cidr_block #private subnet cidr
-  }
-
-  egress{
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_db_subnet_group" "main" {
   name       = "${var.name}-db-sng"
   subnet_ids = var.private_subnet_ids
@@ -44,4 +23,25 @@ resource "aws_db_instance" "main" {
   username            = var.db_username
   password            = var.db_password
   skip_final_snapshot = true
+}
+
+resource "aws_security_group" "rds_sg" {
+  name = "${var.name}-sg"
+  description = "${var.name} rds instance security group"
+  vpc_id = var.vpc_id
+
+  ingress{
+    description = "Allow database traffic on its port"
+    from_port = var.database_port
+    to_port = var.database_port
+    protocol = "tcp"
+    cidr_blocks = var.allowed_cidr_block #private subnet cidr
+  }
+
+  egress{
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
