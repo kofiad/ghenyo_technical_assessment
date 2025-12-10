@@ -11,6 +11,9 @@ terraform {
 }
 
 inputs = {
+  name = "frontend-oac"
+  description = "frontend s3 origin access control"
+  origin_access_control_origin_type = "s3"
   bucket_regional_domain_name = dependency.frontend_s3.outputs.s3_bucket_regional_domain_name
   bucket_id                    = dependency.frontend_s3.outputs.s3_bucket_id
 }
