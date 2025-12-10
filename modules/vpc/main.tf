@@ -57,6 +57,7 @@ resource "aws_subnet" "private-a" {
 
   tags = {
     Name = "${var.vpc_name}-private-a"
+    Tier = "private"
   }
 }
 
@@ -67,6 +68,7 @@ resource "aws_subnet" "private-b" {
 
   tags = {
     Name = "${var.vpc_name}-private-b"
+    Tier = "private"
   }
 }
 
