@@ -28,6 +28,16 @@ output "private_subnet_a_cidr" {
   value       = aws_subnet.private-a.cidr_block
 }
 
+output "private_subnet_b_id" {
+  description = "ID of private subnet B"
+  value       = aws_subnet.private-b.id
+}
+
+output "private_subnet_b_cidr" {
+  description = "ID of private subnet B"
+  value       = aws_subnet.private-b.cidr_block
+}
+
 output "nat_gateway_id" {
   description = "ID of the NAT Gateway"
   value       = aws_nat_gateway.natgw.id
