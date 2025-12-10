@@ -11,7 +11,7 @@ dependency "alb" {
 }
 
 dependency "rds" {
-  config_path = "../../database/rds"
+  config_path = "../database/rds"
 }
 
 locals {
