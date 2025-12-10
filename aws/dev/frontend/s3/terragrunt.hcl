@@ -12,8 +12,8 @@ locals {
 }
 
 inputs = {
-	bucket_name            = "${local.bucket_prefix}-${local.aws_region}"
-	bucket_environment     = "dev"
+	bucket_name              = "${local.bucket_prefix}-technical-assessment"
+	bucket_environment       = "dev"
 	versioning_configuration = true
 }
 
